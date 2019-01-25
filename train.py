@@ -28,8 +28,8 @@ TRANSFORM_IMG = transforms.Compose([
 
 train_data = torchvision.datasets.ImageFolder(root=TRAIN_DATA_PATH, transform=TRANSFORM_IMG)
 train_data_loader = data.DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True,  num_workers=4)
-test_data = torchvision.datasets.ImageFolder(root=TEST_DATA_PATH, transform=TRANSFORM_IMG)
-test_data_loader  = data.DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+# test_data = torchvision.datasets.ImageFolder(root=TEST_DATA_PATH, transform=TRANSFORM_IMG)
+# test_data_loader  = data.DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
 # class Net(nn.Module):
 #     def __init__(self, input_size, hidden_size, num_classes):
@@ -75,16 +75,17 @@ class Net(nn.Module):
 if __name__ == '__main__':
 
     print("Number of train samples: ", len(train_data))
-    print("Number of test samples: ", len(test_data))
+    # print("Number of test samples: ", len(test_data))
     print("Detected Classes are: ", train_data.class_to_idx) # classes are detected by folder structure
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # PyTorch v0.4.0
     model = Net().to(device)
     # summary(model, (1,image_size,image_size))
-    summary(model, (1,420,360))
+    summary(model, (1,360,420))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
     loss_func = nn.CrossEntropyLoss()
+    # loss_func = nn.NLLLoss()
 
     # Training and Testing
     for epoch in range(EPOCHS):
@@ -102,13 +103,20 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
 
-            # # Test -> this is where I have no clue
+            # # # Test -> this is where I have no clue
             if step % 20 == 0:
-                test_x, test_y = next(iter(test_data_loader))
-                b_test_x = Variable(test_x).cuda()
-                b_test_y = Variable(test_y).cuda()
-                test_output = model(b_test_x)
-                pred_y = torch.max(test_output, 1)[1]
-                accuracy = float(sum(pred_y == b_test_y)) / float(test_y.size(0))
-                print('Epoch: ', epoch, '| train loss: %.4f' % loss.item(), '| test accuracy: %.2f' % accuracy)
-                # print('Epoch: ', epoch, '| train loss: %.4f' % loss.item())
+            #     test_x, test_y = next(iter(test_data_loader))
+            #     b_test_x = Variable(test_x).cuda()
+            #     b_test_y = Variable(test_y).cuda()
+            #     test_output = model(b_test_x)
+            #     pred_y = torch.max(test_output, 1)[1]
+            #     accuracy = float(sum(pred_y == b_test_y)) / float(test_y.size(0))
+                # print('Epoch: ', epoch, '| train loss: %.4f' % loss.item(), '| test accuracy: %.2f' % accuracy)
+                print('Epoch: ', epoch, '| train loss: %.4f' % loss.item())
+
+            # An example input you would normally provide to your model's forward() method.
+    example = torch.rand(1, 1, 360, 420).cuda()
+
+    # Use torch.jit.trace to generate a torch.jit.ScriptModule via tracing.
+    traced_script_module = torch.jit.trace(model, example)
+    traced_script_module.save("pytorch_cpp/model.pt")
