@@ -2,6 +2,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
+using namespace cv;
+
 Mat binarizeImg(Mat g_frame)
 {
   threshold(g_frame, g_frame, 180, 255, 0); //For the thresholding part
