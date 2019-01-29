@@ -6,3 +6,6 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_executable(project project.cpp)
 target_link_libraries(project ${OpenCV_LIBS})
+
+add_executable(inspect inspection.cpp)
+target_link_libraries(inspect inspection.cpp)
