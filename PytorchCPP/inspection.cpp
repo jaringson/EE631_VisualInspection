@@ -17,11 +17,12 @@ Mat binarizeImg(Mat g_frame)
   int rows = g_frame.rows;
   int cols = g_frame.cols;
   threshold(g_frame, g_frame, 170, 255, 0); //For the thresholding part
+  int size = 100;
   Rect roi;
-  roi.x = cols/4;
-  roi.width = cols/2;
-  roi.y = rows/4 - 50;
-  roi.height = rows/2 + 100;
+  roi.x = cols/4 - size/2;
+  roi.width = cols/2 + size;
+  roi.y = rows/4 - size/2;
+  roi.height = rows/2 + size;
 
   g_frame = g_frame(roi);
 
@@ -33,7 +34,7 @@ Mat cleanUpNoise(Mat noisy_img)
   Mat img;
   Mat element = getStructuringElement(MORPH_RECT, Size(5, 5)); //Maybe make this 3, 3
   erode(noisy_img, img, element);
-  Mat element2 = getStructuringElement(MORPH_RECT, Size(10, 10)); //Maybe make this 3, 3
+  Mat element2 = getStructuringElement(MORPH_RECT, Size(5, 5)); //Maybe make this 3, 3
   dilate(img, img, element2);
 
   return img;
@@ -62,17 +63,17 @@ Mat addTextToImage(Mat gray_img, int num_loops)
 {
   std::string label;
   if(num_loops == 1)
-    label = "1 Loop";
+    label = "Bad";
   else if(num_loops == 2)
-    label = "2 Loops";
+    label = "Good";
   else if(num_loops == 3)
-    label = "3 Loops";
+    label = "Best";
   else
     label = "";
 
   // Mat img = gray_img.copy();
   // cvtColor(gray_img, img, cv::COLOR_GRAY2BGR);
-  putText(gray_img, label.c_str(), Point(200, 30), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255));
+  putText(gray_img, label.c_str(), Point(30, 30), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255));
   //parameters: output, label, origin, font type, font scale, color
   // Mat color_img;
 
